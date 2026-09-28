@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Login — NexAura{% endblock %}
+{% block head %}
+<style>
+  .auth-wrap {
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+    padding: 2rem; position: relative;
+  }
+  .auth-wrap::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(232,255,71,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .auth-box {
+    position: relative; z-index: 1;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 2.5rem;
+    width: 100%; max-width: 420px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .auth-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
+    color: var(--accent); margin-bottom: 0.25rem;
+  }
+  .auth-logo span { color: var(--text); }
+  .auth-headline {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.6rem; color: var(--text);
+    margin: 1.5rem 0 0.4rem;
+  }
+  .auth-sub { color: var(--muted2); font-size: 0.9rem; margin-bottom: 2rem; }
+  .auth-footer {
+    text-align: center; margin-top: 1.5rem;
+    font-size: 0.875rem; color: var(--muted2);
+  }
+  .auth-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .auth-footer a:hover { text-decoration: underline; }
+  .submit-btn {
+    width: 100%; padding: 0.85rem;
+    background: var(--accent); color: #000;
+    border: none; border-radius: 10px;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .submit-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .divider-line {
+    border: none; border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-box">
+    <a href="{{ url_for('index') }}" class="auth-logo">Nex<span>Aura</span></a>
+    <h2 class="auth-headline">Welcome back</h2>
+    <p class="auth-sub">Sign in to your personalised recommendations.</p>
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="your_username" required autocomplete="username"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password"/>
+      </div>
+      <button type="submit" class="submit-btn">Sign In →</button>
+    </form>
+    <hr class="divider-line"/>
+    <div class="auth-footer">
+      Don't have an account? <a href="{{ url_for('register') }}">Create one</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

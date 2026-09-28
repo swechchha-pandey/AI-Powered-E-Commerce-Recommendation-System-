@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}NexAura — AI-Powered Recommendations{% endblock %}
+{% block head %}
+<style>
+  body { overflow-x: hidden; }
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 2rem;
+    position: relative;
+  }
+  /* animated grid background */
+  .hero::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+  /* glow orbs */
+  .orb {
+    position: fixed; border-radius: 50%;
+    filter: blur(80px); pointer-events: none; z-index: 0;
+  }
+  .orb-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(232,255,71,0.06), transparent);
+    top: -100px; right: -100px;
+    animation: float1 8s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(79,172,254,0.05), transparent);
+    bottom: 100px; left: -100px;
+    animation: float2 10s ease-in-out infinite;
+  }
+  @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(30px)} }
+  @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 700px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2);
+    color: var(--accent); padding: 0.35rem 1rem; border-radius: 100px;
+    font-size: 0.8rem; font-family: 'DM Mono', monospace;
+    margin-bottom: 2rem; letter-spacing: 0.05em;
+    animation: fadeUp 0.6s ease both;
+  }
+  .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+
+  h1 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 1; letter-spacing: -0.04em;
+    color: var(--text);
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  h1 .accent-word { color: var(--accent); }
+
+  .hero-sub {
+    color: var(--muted2); font-size: 1.05rem;
+    max-width: 480px; margin: 1.5rem auto 2.5rem;
+    line-height: 1.7;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .btn-hero {
+    padding: 0.85rem 2rem; border-radius: 12px;
+    font-size: 1rem; font-weight: 500;
+    text-decoration: none; transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-hero-primary { background: var(--accent); color: #000; }
+  .btn-hero-primary:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(232,255,71,0.2); }
+  .btn-hero-ghost { background: var(--bg2); color: var(--text); border: 1px solid var(--border2); }
+  .btn-hero-ghost:hover { background: var(--bg3); transform: translateY(-2px); }
+
+  .segments {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem; max-width: 900px; margin: 5rem auto 0; padding: 0 2rem;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .seg-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.25rem;
+    text-align: left; transition: border-color 0.2s;
+  }
+  .seg-card:hover { border-color: var(--border2); }
+  .seg-card .seg-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; margin-bottom: 0.75rem;
+  }
+  .seg-card h3 {
+    font-family: 'DM Mono', monospace; font-size: 0.8rem;
+    font-weight: 500; margin-bottom: 0.35rem;
+  }
+  .seg-card p { font-size: 0.82rem; color: var(--muted2); line-height: 1.5; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <div class="pulse"></div>
+      Hybrid NCF · 4-Segment Engine
+    </div>
+    <h1>Smart Recs<br/>That <span class="accent-word">Evolve</span></h1>
+    <p class="hero-sub">
+      Recommendations that get smarter with every interaction.
+      From global trends to deep personalisation — automatically.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('register') }}" class="btn-hero btn-hero-primary">
+        Get Started →
+      </a>
+      <a href="{{ url_for('login') }}" class="btn-hero btn-hero-ghost">
+        Sign In
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="segments">
+  <div class="seg-card">
+    <div class="seg-icon" style="background:rgba(79,172,254,0.1);color:var(--seg-a);">A</div>
+    <h3 style="color:var(--seg-a);">Segment A</h3>
+    <p>New user? Get the best globally-rated products via Bayesian scoring.</p>
+  </div>
+  <div class="seg-card">
+    <div class="seg-icon" style="background:rgba(167,139,250,0.1);color:var(--seg-b);">B</div>
+    <h3 style="color:var(--seg-b);">Segment B</h3>
+    <p>Cold-start: one purchase gives us your category & price preference.</p>
+  </div>
+  <div class="seg-card">
+    <div class="seg-icon" style="background:rgba(52,211,153,0.1);color:var(--seg-c);">C</div>
+    <h3 style="color:var(--seg-c);">Segment C</h3>
+    <p>Warm user: multi-category profiling with price-tier awareness.</p>
+  </div>
+  <div class="seg-card">
+    <div class="seg-icon" style="background:rgba(249,115,22,0.1);color:var(--seg-d);">D</div>
+    <h3 style="color:var(--seg-d);">Segment D</h3>
+    <p>Active user: full NeuMF NCF + popularity boost for deep personalisation.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Your Preferences — NexAura{% endblock %}
+{% block head %}
+<style>
+  .pref-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+  }
+
+  /* animated background grid */
+  .pref-wrap::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(232,255,71,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 25s linear infinite;
+  }
+  @keyframes gridDrift {
+    0%   { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  .pref-box {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HEADER ── */
+  .pref-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.4rem; color: var(--accent);
+    margin-bottom: 2rem; display: inline-block;
+  }
+  .pref-logo span { color: var(--text); }
+
+  .pref-step {
+    font-size: 0.75rem; font-family: 'DM Mono', monospace;
+    color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .pref-step::before {
+    content: '';
+    display: inline-block; width: 20px; height: 1px;
+    background: var(--accent);
+  }
+
+  .pref-title {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 2rem; color: var(--text);
+    line-height: 1.15; letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+  .pref-title .hl { color: var(--accent); }
+
+  .pref-sub {
+    font-size: 0.9rem; color: var(--muted2);
+    margin-bottom: 2rem; line-height: 1.6;
+  }
+
+  /* ── CATEGORY GRID ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .cat-item {
+    position: relative;
+  }
+
+  .cat-item input[type="checkbox"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+  }
+
+  .cat-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+
+  .cat-label:hover {
+    border-color: rgba(232,255,71,0.25);
+    background: var(--bg3);
+  }
+
+  .cat-item input:checked + .cat-label {
+    background: rgba(232,255,71,0.07);
+    border-color: rgba(232,255,71,0.4);
+    box-shadow: 0 0 0 1px rgba(232,255,71,0.15);
+  }
+
+  .cat-emoji {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    width: 28px; text-align: center;
+  }
+
+  .cat-text {
+    font-size: 0.82rem;
+    color: var(--muted2);
+    line-height: 1.3;
+    transition: color 0.15s;
+  }
+
+  .cat-item input:checked + .cat-label .cat-text {
+    color: var(--text);
+  }
+
+  .cat-check {
+    margin-left: auto;
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 0.65rem;
+    color: transparent;
+  }
+
+  .cat-item input:checked + .cat-label .cat-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  /* ── COUNTER ── */
+  .sel-counter {
+    font-size: 0.8rem; font-family: 'DM Mono', monospace;
+    color: var(--muted); margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .sel-count {
+    color: var(--accent); font-weight: 500;
+    transition: all 0.2s;
+  }
+  .sel-hint {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  /* ── SUBMIT ── */
+  .pref-submit {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: -0.01em;
+    transition: all 0.2s;
+    display: flex; align-items: center;
+    justify-content: center; gap: 0.5rem;
+  }
+  .pref-submit:hover {
+    background: var(--accent2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(232,255,71,0.15);
+  }
+  .pref-submit:disabled {
+    background: var(--bg3);
+    color: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .skip-link {
+    display: block; text-align: center;
+    margin-top: 1rem; font-size: 0.82rem;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+  .skip-link:hover { color: var(--muted2); }
+
+  /* ── SELECT ALL ── */
+  .pref-actions {
+    display: flex; gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .pref-action-btn {
+    font-size: 0.78rem; font-family: 'DM Mono', monospace;
+    color: var(--muted2); background: none;
+    border: 1px solid var(--border2);
+    padding: 0.3rem 0.75rem; border-radius: 6px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .pref-action-btn:hover {
+    color: var(--text); border-color: var(--border2);
+    background: var(--bg3);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pref-wrap">
+  <div class="pref-box">
+
+    <a href="{{ url_for('index') }}" class="pref-logo">Nex<span>Aura</span></a>
+
+    <div class="pref-step">Step 1 of 1 &nbsp;·&nbsp; Personalization</div>
+    <h1 class="pref-title">
+      What do you<br/><span class="hl">like to shop?</span>
+    </h1>
+    <p class="pref-sub">
+      Choose categories you're interested in — we'll tailor your recommendations from the start.
+    </p>
+
+    <form method="POST" action="{{ url_for('preferences') }}">
+
+      <!-- Quick actions -->
+      <div class="pref-actions">
+        <button type="button" class="pref-action-btn" onclick="selectAll()">Select All</button>
+        <button type="button" class="pref-action-btn" onclick="clearAll()">Clear</button>
+      </div>
+
+      <!-- Counter -->
+      <div class="sel-counter">
+        <span class="sel-count" id="selCount">0</span>
+        <span>categories selected</span>
+        <span class="sel-hint">(select at least 1)</span>
+      </div>
+
+      <!-- Category checkboxes -->
+      <div class="cat-grid">
+        {% set categories = [
+          ('bed_bath_table',        '🛏️',  'Bed & Bath'),
+          ('health_beauty',         '💆',  'Health & Beauty'),
+          ('computers_accessories', '💻',  'Computers'),
+          ('sports_leisure',        '⚽',  'Sports & Leisure'),
+          ('watches_gifts',         '⌚',  'Watches & Gifts'),
+          ('furniture_decor',       '🪴',  'Furniture & Decor'),
+          ('housewares',            '🍳',  'Housewares'),
+          ('perfumery',             '🌸',  'Perfumery'),
+          ('cool_stuff',            '✨',  'Cool Stuff'),
+          ('toys',                  '🧸',  'Toys'),
+          ('telephony',             '📱',  'Telephony'),
+          ('garden_tools',          '🌿',  'Garden Tools'),
+          ('auto',                  '🚗',  'Auto'),
+          ('office_furniture',      '🖥️',  'Office'),
+          ('musical_instruments',   '🎸',  'Music'),
+          ('books_technical',       '📚',  'Books & Tech'),
+          ('pet_shop',              '🐾',  'Pet Shop'),
+        ] %}
+
+        {% for value, emoji, label in categories %}
+        <div class="cat-item">
+          <input
+            type="checkbox"
+            name="categories"
+            id="cat_{{ value }}"
+            value="{{ value }}"
+            {% if value in (selected_categories or []) %}checked{% endif %}
+            onchange="updateCount()"
+          />
+          <label class="cat-label" for="cat_{{ value }}">
+            <span class="cat-emoji">{{ emoji }}</span>
+            <span class="cat-text">{{ label }}</span>
+            <span class="cat-check">✓</span>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="pref-submit" id="submitBtn" disabled>
+        Save & See My Recommendations →
+      </button>
+    </form>
+
+    <a href="{{ url_for('dashboard') }}" class="skip-link">
+      Skip for now — show me general recommendations
+    </a>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateCount() {
+    const checked = document.querySelectorAll('input[name="categories"]:checked').length;
+    document.getElementById('selCount').textContent = checked;
+    document.getElementById('submitBtn').disabled = checked === 0;
+  }
+
+  function selectAll() {
+    document.querySelectorAll('input[name="categories"]').forEach(cb => cb.checked = true);
+    updateCount();
+  }
+
+  function clearAll() {
+    document.querySelectorAll('input[name="categories"]').forEach(cb => cb.checked = false);
+    updateCount();
+  }
+
+  // Init count on page load (for edit preferences case)
+  updateCount();
+</script>
+{% endblock %}
